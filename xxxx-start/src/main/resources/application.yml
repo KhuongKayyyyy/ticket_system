@@ -1,2 +1,46 @@
 server:
   port: 1122
+
+
+resilience4j.ratelimiter:
+  instances:
+    backendA:
+      limitForPeriod: 2
+      limitRefreshPeriod: 10s
+      timeoutDuration: 0
+      registerHealthIndicator: true
+      eventConsumerBufferSize: 100
+    backendB:
+      limitForPeriod: 5
+      limitRefreshPeriod: 10s
+      timeoutDuration: 3s
+management:
+  health:
+    circuitbreakers:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include:
+          - '*'
+  endpoint:
+    health:
+      show-details: always
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      checkRandom:
+          registerHealthIndicator: true
+#          đánh giá tỉ lệ lỗi bên thứ 3
+          slidingWindowSize: 10
+#          số lượng request cho phép ở trạng thái half-open.
+          permittedNumberOfCallsInHalfOpenState: 3
+#          bỏ ddeer lấy mặc định count based
+#          slidingWindowType: TIME_BASED
+          minimumNumberOfCalls: 5
+#          thời gian chờ
+          waitDurationInOpenState: 5s
+          failureRateThreshold: 50
+          eventConsumerBufferSize: 10
+#          recordFailurePredicate: io.github.robwin.exception.RecordFailurePredicate
